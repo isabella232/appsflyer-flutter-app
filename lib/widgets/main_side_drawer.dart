@@ -1,7 +1,7 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
-import '../providers/auth.dart';
+import '../providers/auth/auth.dart';
 import '../screens/about_screen.dart';
 import '../screens/lists_overview_screen.dart';
 
@@ -16,7 +16,6 @@ class MainSideDrawer extends StatelessWidget {
             padding: EdgeInsets.all(12.0),
             child: Consumer<Auth>(
               builder: (ctx, auth, _) {
-                print(auth.user.email);
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -28,7 +27,7 @@ class MainSideDrawer extends StatelessWidget {
                       radius: 44,
                     ),
                     Text(
-                      auth.user.email,
+                      auth.getUser().email,
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,

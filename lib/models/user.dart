@@ -1,4 +1,5 @@
 class User {
+  String email;
   String userId;
   List<String> _shortlist = [];
 
@@ -10,7 +11,7 @@ class User {
     _shortlist = val;
   }
 
-  User(this.userId);
+  User(this.userId, this.email);
 
   void addToShortlist(String id) {
     if (!_shortlist.contains(id)) {

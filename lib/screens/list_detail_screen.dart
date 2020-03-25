@@ -49,34 +49,42 @@ class ListDetailScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              bottomNavigationBar: BottomAppBar(
-                color: Theme.of(context).primaryColor,
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      SelectableText(
-                        shoppingList.id,
-                        style: TextStyle(
-                          color: Colors.white,
+              bottomNavigationBar: Builder(
+                builder: (ctx) => BottomAppBar(
+                  color: Theme.of(context).primaryColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SelectableText(
+                          shoppingList.id,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: 12,
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Share.share('sharing',
-                              subject: 'sharing from EZShop');
-                        },
-                        icon: Icon(
-                          Icons.share,
-                          color: Colors.white,
+                        SizedBox(
+                          width: 12,
                         ),
-                      ),
-                    ],
+                        IconButton(
+                          onPressed: () {
+                            Scaffold.of(ctx).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text("This feature is not yet available"),
+                              ),
+                            );
+//                          Share.share('sharing',
+//                              subject: 'sharing from EZShop');
+                          },
+                          icon: Icon(
+                            Icons.share,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

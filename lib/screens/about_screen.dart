@@ -1,7 +1,10 @@
+import 'package:ezshop/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../constants.dart';
 import '../widgets/main_side_drawer.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -49,22 +52,43 @@ class AboutScreen extends StatelessWidget {
               SizedBox(
                 height: 24,
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColorLight,
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: ListTile(
-                  onTap: () async {
-                    await _launchUrl();
-                  },
-                  leading: Icon(FontAwesomeIcons.github),
-                  title: Text('To the GitHub repository'),
-                ),
+              Consumer<AppProvider>(
+                builder: (context, app, _) => buildDetailsContainer(
+                    context: context,
+                    label:
+                        "${Constants.VERSION_NUMBER} (${AppModeHelper.getValue(app.appMode)})",
+                    iconData: FontAwesomeIcons.mobileAlt),
+              ),
+              buildDetailsContainer(
+                context: context,
+                label: 'To the GitHub repository',
+                iconData: FontAwesomeIcons.github,
+                onClick: () async {
+                  await _launchUrl();
+                },
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Container buildDetailsContainer(
+      {@required BuildContext context,
+      @required String label,
+      @required IconData iconData,
+      Function onClick}) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 6.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColorLight,
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: ListTile(
+        onTap: onClick == null ? () {} : onClick,
+        leading: Icon(iconData),
+        title: Text(label),
       ),
     );
   }

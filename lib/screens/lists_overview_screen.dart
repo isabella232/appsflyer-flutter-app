@@ -1,6 +1,9 @@
+import 'package:ezshop/models/shopping_list.dart';
+import 'package:ezshop/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../constants.dart';
 import '../providers/shopping_lists.dart';
 import '../widgets/main_side_drawer.dart';
 import '../widgets/shopping_list_view.dart';
@@ -40,6 +43,9 @@ class BottomBarListButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shoppingListsData = Provider.of<ShoppingLists>(context);
+    AppMode appMode = Provider.of<AppProvider>(context).appMode;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.0),
@@ -51,7 +57,22 @@ class BottomBarListButtons extends StatelessWidget {
             child: FlatButton.icon(
               icon: Icon(Icons.add),
               label: Text("Create New List"),
-              onPressed: () {
+              onPressed: () async {
+                if (appMode == AppMode.OpenSource) {
+                  List<ShoppingList> lists =
+                      await shoppingListsData.fetchLists();
+                  if (lists != null &&
+                      lists.length == Constants.MAXIMUM_NUMBER_OF_LISTS) {
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            "You've reached your limit of ${Constants.MAXIMUM_NUMBER_OF_LISTS} lists. Try the full version for unlimited number of lists"),
+                      ),
+                    );
+                    return;
+                  }
+                }
+
                 Navigator.of(context)
                     .pushNamed(CreateListScreen.routeName)
                     .then(
@@ -69,29 +90,45 @@ class BottomBarListButtons extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: FlatButton.icon(
-              icon: Icon(Icons.search),
-              label: Text("Search List"),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (ctx) => Dialog(
-                    elevation: 10.0,
-                    child: SearchListForm(),
-                  ),
-                ).then((val) {
-                  Provider.of<ShoppingLists>(context)
-                      .searchList(val)
-                      .then((isFound) {
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                      content: isFound
-                          ? Text('Added a new shopping list to your shortlist')
-                          : Text(
-                              'Did not find any shopping list with the id $val'),
-                    ));
-                  });
-                });
-              },
+            child: Consumer<AppProvider>(
+              builder: (ctx, app, _) => FlatButton.icon(
+                icon: Icon(Icons.search),
+                label: Text("Search List"),
+                onPressed: () {
+                  app.appMode == AppMode.Full
+                      ? showDialog(
+                          context: context,
+                          builder: (ctx) => Dialog(
+                            elevation: 10.0,
+                            child: SearchListForm(),
+                          ),
+                        ).then(
+                          (val) {
+                            Provider.of<ShoppingLists>(context)
+                                .searchList(val)
+                                .then(
+                              (isFound) {
+                                Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: isFound
+                                        ? Text(
+                                            'Added a new shopping list to your shortlist')
+                                        : Text(
+                                            'Did not find any shopping list with the id $val'),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        )
+                      : Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                "This feature is not available in the open source version"),
+                          ),
+                        );
+                },
+              ),
             ),
           )
         ],

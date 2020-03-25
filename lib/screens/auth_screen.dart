@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
-import '../providers/auth.dart';
+import '../providers/auth/auth.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -155,7 +155,6 @@ class _AuthCardState extends State<AuthCard> {
             .signUp(_authData['email'], _authData['password']);
       }
     } catch (e) {
-      print("inside error");
       var errorMessage = 'Authentication failed';
       if (e.toString().contains('EMAIL_EXISTS')) {
         errorMessage = 'This email address is already in use';

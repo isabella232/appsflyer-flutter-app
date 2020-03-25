@@ -110,7 +110,6 @@ class _CreateListScreenState extends State<CreateListScreen> {
       }
       _firstRun = false;
     }
-    print(listId);
 
     return WillPopScope(
       onWillPop: () => mode == Mode.CreateMode

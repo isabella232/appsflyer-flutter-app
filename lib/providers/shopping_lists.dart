@@ -1,46 +1,79 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/shopping_list.dart';
 import '../models/user.dart';
 import '../services/api.dart';
 import './shopping_item.dart';
+import './app_provider.dart';
 
 class ShoppingLists with ChangeNotifier {
   Api _apiShoppingLists = Api('shoppingLists');
   Api _apiUsers = Api('usersShortlist');
+  AppMode _appMode;
 
   List<ShoppingList> _lists = [];
 
   String _userId;
-  User user;
-  FirebaseUser _firebaseUser;
+  User _user;
 
-  set firebaseUser(FirebaseUser user) {
-    if (user != null) {
-      userId = user.uid;
+  set user(User myUser) {
+    if (myUser == null) {
+      _user = null;
+      return;
     }
-    _firebaseUser = user;
+
+    _userId = myUser.userId;
+    _user = myUser;
   }
 
-  set userId(String value) {
-    _userId = value;
-    user = User(value);
+  User get user {
+    return _user;
   }
 
-  //Firestore
+  set appMode(AppMode appMode) {
+    _appMode = appMode;
+  }
+
   Future<List<ShoppingList>> fetchLists() async {
-    var result = await _apiShoppingLists.getDataCollection();
-    _lists = result.documents
-        .map((doc) => ShoppingList.fromMap(doc.data, doc.documentID))
-        .toList();
-    return [..._lists];
+    if (_appMode == AppMode.OpenSource) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> encodedLists = prefs.getStringList("lists");
+      if (encodedLists == null) {
+        return null;
+      }
+
+      List<ShoppingList> sharedPrefsLists = encodedLists.map((encodedList) {
+        int index = encodedLists.indexOf(encodedList);
+        Map<String, dynamic> decodedListMap = json.decode(encodedList);
+        return ShoppingList.fromMap(decodedListMap, (++index).toString());
+      }).toList();
+
+      sharedPrefsLists.forEach((sharedPrefsList) {
+        bool exist = _lists
+                .where(
+                    (list) => list.timestampId == sharedPrefsList.timestampId)
+                .toList()
+                .length >
+            0;
+        if (!exist) {
+          _lists.add(sharedPrefsList);
+        }
+      });
+      return _lists;
+    }
   }
 
   Future<Stream<QuerySnapshot>> fetchListsAsStream() async {
     //Get the list of shoppingLists ids of the user
     if (_userId == null) {
+      return null;
+    }
+
+    if (_appMode == AppMode.OpenSource) {
       return null;
     }
 
@@ -54,6 +87,7 @@ class ShoppingLists with ChangeNotifier {
   }
 
   //Search list by list id. if found something add it to the user shortlist
+  //Only available for Firebase version
   Future<bool> searchList(String listId) async {
     DocumentSnapshot snapshot = await _apiShoppingLists.getDocumentById(listId);
     if (snapshot.data == null) {
@@ -66,6 +100,10 @@ class ShoppingLists with ChangeNotifier {
   }
 
   Future<ShoppingList> getListById(String id) async {
+    if (_appMode == AppMode.OpenSource) {
+      return _lists.firstWhere((list) => list.id == id);
+    }
+
     var doc = await _apiShoppingLists.getDocumentById(id);
     if (doc.data == null) {
       return _lists.firstWhere((list) => list.id == id);
@@ -81,7 +119,12 @@ class ShoppingLists with ChangeNotifier {
     return;
   }
 
+  //Update the list with the toggled item
   Future updateList(ShoppingList data, String id) async {
+    if (_appMode == AppMode.OpenSource) {
+      return;
+    }
+
     await _apiShoppingLists.updateDocument(data.toJson(), id);
     return;
   }
@@ -103,6 +146,19 @@ class ShoppingLists with ChangeNotifier {
     final myList = await getListById(listId);
     myList.title =
         listName; //update the list name (when initially created it is still null)
+
+    //Check if the app is from GitHub. If it is, save it into the shared preferences
+    if (_appMode == AppMode.OpenSource) {
+      //Todo: Save into shared preferences
+
+      //convert _lists into encoded list
+      List<String> encodedLists =
+          _lists.map((list) => json.encode(list)).toList();
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setStringList("lists", encodedLists);
+      return;
+    }
 
     if (myList.id.contains('temp')) {
       //Add new list to both user and shoppingLists collections
@@ -155,7 +211,8 @@ class ShoppingLists with ChangeNotifier {
 
   String createList() {
     final listId = 'temp${DateTime.now().toIso8601String()}';
-    _lists.add(ShoppingList(id: listId, title: 'temp list', items: []));
+    _lists.add(ShoppingList(
+        id: listId, title: 'temp list', items: [], timestampId: listId));
     return listId;
   }
 

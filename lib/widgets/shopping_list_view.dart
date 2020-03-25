@@ -1,3 +1,4 @@
+import 'package:ezshop/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,9 +14,12 @@ class ShoppingListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final shoppingListsData = Provider.of<ShoppingLists>(context);
     final size = MediaQuery.of(context).size;
+    final AppMode appMode = Provider.of<AppProvider>(context).appMode;
 
     return FutureBuilder(
-      future: shoppingListsData.fetchListsAsStream(),
+      future: appMode == AppMode.Full
+          ? shoppingListsData.fetchListsAsStream()
+          : shoppingListsData.fetchLists(),
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -31,37 +35,40 @@ class ShoppingListView extends StatelessWidget {
               //The user is not registered in our db yet
               return _buildEmptyListPlaceholder(size);
             }
-            return StreamBuilder(
-              stream: dataSnapshot.data,
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (snapshot.hasData) {
-                  _lists = snapshot.data.documents
-                      .map((doc) =>
-                          ShoppingList.fromMap(doc.data, doc.documentID))
-                      .toList();
-                  if (_lists.length == 0) {
-                    return _buildEmptyListPlaceholder(size);
-                  }
-                  return ListView.builder(
-                    itemBuilder: (ctx, i) => ListOverviewItem(
-                        _lists[i].id,
-                        _lists[i].title,
-                        _lists[i].items,
-                        _lists[i].totalChecked()),
-                    itemCount: _lists.length,
-                  );
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            );
+            return appMode == AppMode.Full
+                ? buildStreamBuilder(dataSnapshot, size)
+                : buildListViewFromDataSnapshot(dataSnapshot);
           }
+        }
+      },
+    );
+  }
+
+  StreamBuilder<QuerySnapshot> buildStreamBuilder(
+      AsyncSnapshot dataSnapshot, Size size) {
+    return StreamBuilder(
+      stream: dataSnapshot.data,
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasData) {
+          _lists = snapshot.data.documents
+              .map((doc) => ShoppingList.fromMap(doc.data, doc.documentID))
+              .toList();
+          if (_lists.length == 0) {
+            return _buildEmptyListPlaceholder(size);
+          }
+          return ListView.builder(
+            itemBuilder: (ctx, i) => ListOverviewItem(_lists[i].id,
+                _lists[i].title, _lists[i].items, _lists[i].totalChecked()),
+            itemCount: _lists.length,
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         }
       },
     );
@@ -88,6 +95,15 @@ class ShoppingListView extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  Widget buildListViewFromDataSnapshot(AsyncSnapshot dataSnapshot) {
+    _lists = dataSnapshot.data;
+    return ListView.builder(
+      itemBuilder: (ctx, i) => ListOverviewItem(_lists[i].id, _lists[i].title,
+          _lists[i].items, _lists[i].totalChecked()),
+      itemCount: _lists.length,
     );
   }
 }
