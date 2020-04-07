@@ -1,7 +1,7 @@
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
+import 'package:ezshop/locator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:global_configuration/global_configuration.dart';
 
 import './screens/lists_overview_screen.dart';
 import './screens/list_detail_screen.dart';
@@ -15,24 +15,11 @@ import './providers/app_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await GlobalConfiguration().loadFromAsset('app_settings');
-  //Set up appsflyer sdk
-  final AppsFlyerOptions options = AppsFlyerOptions(
-    afDevKey: GlobalConfiguration().getString("devKey"),
-    appId: GlobalConfiguration().getString("appId"),
-    showDebug: true,
-  );
-
-  runApp(MyApp(appsFlyerOptions: options));
+  setupLocator();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  AppsflyerSdk appsflyerSdk;
-
-  MyApp({appsFlyerOptions}) {
-    appsflyerSdk = AppsflyerSdk(appsFlyerOptions);
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(

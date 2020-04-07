@@ -1,3 +1,4 @@
+import 'package:ezshop/providers/app_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -55,6 +56,14 @@ class MainSideDrawer extends StatelessWidget {
   ListTile _buildLogOutItem(BuildContext context) {
     return ListTile(
       onTap: () async {
+        if (Provider.of<AppProvider>(context, listen: false).appMode ==
+            AppMode.OpenSource) {
+          Navigator.of(context).pop();
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text("Cant logout, you are on Open Source version"),
+          ));
+          return;
+        }
         await Provider.of<Auth>(context, listen: false).signOut();
         Navigator.of(context).pop();
       },

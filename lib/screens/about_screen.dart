@@ -1,3 +1,4 @@
+import 'package:ezshop/custom_icons.dart';
 import 'package:ezshop/providers/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,6 +14,7 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final app = Provider.of<AppProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -52,13 +54,42 @@ class AboutScreen extends StatelessWidget {
               SizedBox(
                 height: 24,
               ),
-              Consumer<AppProvider>(
-                builder: (context, app, _) => buildDetailsContainer(
-                    context: context,
-                    label:
-                        "${Constants.VERSION_NUMBER} (${AppModeHelper.getValue(app.appMode)})",
-                    iconData: FontAwesomeIcons.mobileAlt),
+              buildDetailsContainer(
+                context: context,
+                label:
+                    "${Constants.VERSION_NUMBER} (${AppModeHelper.getValue(app.appMode)})",
+                iconData: FontAwesomeIcons.mobileAlt,
               ),
+              app.appsFlyerSdkMode == AppsFlyerSdkMode.Initialized
+                  ? FutureBuilder(
+                      future: app.appsFlyerService.appsFlyerSdk.getSDKVersion(),
+                      builder: (ctx, dataSnapshot) {
+                        if (dataSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else {
+                          if (dataSnapshot.error != null) {
+                            return Center(
+                              child: Text('An error occured'),
+                            );
+                          } else {
+                            String version = dataSnapshot.data as String;
+                            return buildDetailsContainer(
+                              context: context,
+                              label: version,
+                              iconData: CustomIcons.appsflyer,
+                            );
+                          }
+                        }
+                      },
+                    )
+                  : buildDetailsContainer(
+                      context: context,
+                      label: "AppsFlyer SDK not initialised",
+                      iconData: CustomIcons.appsflyer,
+                    ),
               buildDetailsContainer(
                 context: context,
                 label: 'To the GitHub repository',
@@ -87,7 +118,10 @@ class AboutScreen extends StatelessWidget {
       ),
       child: ListTile(
         onTap: onClick == null ? () {} : onClick,
-        leading: Icon(iconData),
+        leading: Icon(
+          iconData,
+          size: 30,
+        ),
         title: Text(label),
       ),
     );

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:ezshop/locator.dart';
+import 'package:ezshop/services/appsflyer.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +15,7 @@ import './app_provider.dart';
 class ShoppingLists with ChangeNotifier {
   Api _apiShoppingLists = Api('shoppingLists');
   Api _apiUsers = Api('usersShortlist');
+  AppsFlyerService _appsFlyerService = locator<AppsFlyerService>();
   AppMode _appMode;
 
   List<ShoppingList> _lists = [];
@@ -122,6 +125,7 @@ class ShoppingLists with ChangeNotifier {
   //Update the list with the toggled item
   Future updateList(ShoppingList data, String id) async {
     if (_appMode == AppMode.OpenSource) {
+      await _saveToSharedPrefs();
       return;
     }
 
@@ -147,16 +151,12 @@ class ShoppingLists with ChangeNotifier {
     myList.title =
         listName; //update the list name (when initially created it is still null)
 
+    _appsFlyerService.appsFlyerSdk.trackEvent(
+        "Added new list", {"List Name": myList.title, "user": user.email});
     //Check if the app is from GitHub. If it is, save it into the shared preferences
     if (_appMode == AppMode.OpenSource) {
-      //Todo: Save into shared preferences
-
       //convert _lists into encoded list
-      List<String> encodedLists =
-          _lists.map((list) => json.encode(list)).toList();
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setStringList("lists", encodedLists);
+      await _saveToSharedPrefs();
       return;
     }
 
@@ -174,6 +174,14 @@ class ShoppingLists with ChangeNotifier {
       updateList(myList, listId);
       return;
     }
+  }
+
+  Future _saveToSharedPrefs() async {
+    List<String> encodedLists =
+        _lists.map((list) => json.encode(list)).toList();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setStringList("lists", encodedLists);
   }
 
   void addListToUser(String shoppingListFirestoreId) {
