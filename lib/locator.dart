@@ -1,5 +1,6 @@
-import 'package:ezshop/services/appsflyer.dart';
 import 'package:get_it/get_it.dart';
+
+import './core/services/appsflyer.dart';
 
 GetIt locator = GetIt.instance;
 

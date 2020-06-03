@@ -1,20 +1,25 @@
-import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:ezshop/locator.dart';
+import 'package:ezshop/ui/screens/about_screen/about_screen.dart';
+import 'package:ezshop/ui/screens/landing_screen/landing_screen.dart';
+import 'package:ezshop/ui/screens/settings_screen/settings_screen.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import './screens/lists_overview_screen.dart';
-import './screens/list_detail_screen.dart';
-import './screens/create_list_screen.dart';
-import './screens/auth_screen.dart';
-import './screens/about_screen.dart';
-import './providers/auth/auth.dart';
-import './providers/shopping_lists.dart';
-import './providers/auth/auth_interface.dart';
-import './providers/app_provider.dart';
+import './core/providers/app_provider.dart';
+import './core/providers/auth/auth.dart';
+import './core/providers/shopping_lists.dart';
+import 'ui/screens/auth_screen/auth_screen.dart';
+import 'ui/screens/create_list_screen/create_list_screen.dart';
+import 'ui/screens/list_detail_screen/list_detail_screen.dart';
+import 'ui/screens/list_overview_screen/lists_overview_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Crashlytics.instance.enableInDevMode = true;
+
+  // Pass all uncaught errors from the framework to Crashlytics.
+  FlutterError.onError = Crashlytics.instance.recordFlutterError;
   setupLocator();
   runApp(MyApp());
 }
@@ -46,19 +51,15 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.amber,
           fontFamily: 'Lato',
         ),
-        home: Consumer<Auth>(builder: (ctx, auth, _) {
-          Status _status = auth.getStatus();
-          return _status == Status.Authenticated ||
-                  _status == Status.OpenSourceUser
-              ? ListsOverviewScreen()
-              : AuthScreen();
-        }),
+        home: LandingScreen(),
         routes: {
           AuthScreen.routeName: (ctx) => AuthScreen(),
           ListsOverviewScreen.routeName: (ctx) => ListsOverviewScreen(),
           ListDetailScreen.routeName: (ctx) => ListDetailScreen(),
           CreateListScreen.routeName: (ctx) => CreateListScreen(),
           AboutScreen.routeName: (ctx) => AboutScreen(),
+          SettingsScreen.routeName: (ctx) => SettingsScreen(),
+          LandingScreen.routeName: (ctx) => LandingScreen(),
         },
       ),
     );
