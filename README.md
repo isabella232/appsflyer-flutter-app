@@ -1,6 +1,10 @@
 # ezshop
 Your place to create shareable lists in a few easy steps
-<img src="https://github.com/AppsFlyerSDK/appsflyer-flutter-app/blob/master/assets/images/screenshot_1.png" width="200" height="432">
+
+<img src="https://github.com/AppsFlyerSDK/appsflyer-flutter-app/blob/master/assets/images/screenshot_1.png" width="240" height="432">
+<img src="https://github.com/AppsFlyerSDK/appsflyer-flutter-app/blob/master/assets/images/screenshot_2.png" width="240" height="432">
+<img src="https://github.com/AppsFlyerSDK/appsflyer-flutter-app/blob/master/assets/images/screenshot_3.png" width="240" height="432">
+<img src="https://github.com/AppsFlyerSDK/appsflyer-flutter-app/blob/master/assets/images/screenshot_4.png" width="240" height="432">
 
 ## About the app
 This app was made in order of giving a real life example of implementing appsflyer sdk in your app.
