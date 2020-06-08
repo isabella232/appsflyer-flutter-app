@@ -11,3 +11,9 @@ The app let you share a grocery list in easy way with others, and let you track 
 In order to launch the project you have to first clone this repository. after you clone this repository, you will need to add your own Firebase project. Open new Firebase project <https://firebase.google.com/|here>
 Configure new iOS and Android app in the Firebase console, following the steps there.
 - in `constants.dart` change the constant HAS_FIREBASE to true after you finish migrating your firebase project.
+
+## Future Milestones
+- Add the option to share the list through 3rd party apps like whatsapp, facebook messenger
+- Options to add images to the items in the list
+
+Feel free to add your thoughts and suggestions to mobilesdk-team@appsflyer.com
