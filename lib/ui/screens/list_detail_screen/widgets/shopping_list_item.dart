@@ -7,8 +7,9 @@ import 'package:provider/provider.dart';
 class ShoppingListItem extends StatelessWidget {
   final ShoppingList shoppingList;
   final int index;
+  final bool showQuantity;
 
-  ShoppingListItem(this.shoppingList, this.index);
+  ShoppingListItem(this.shoppingList, this.index, this.showQuantity);
 
   @override
   Widget build(BuildContext context) {
@@ -60,12 +61,14 @@ class ShoppingListItem extends StatelessWidget {
                     ),
                   ),
                   Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "x" + item.quantity.toString(),
-                    ),
-                  ),
+                  showQuantity
+                      ? Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "x" + item.quantity.toString(),
+                          ),
+                        )
+                      : Center()
                 ],
               ),
             ),

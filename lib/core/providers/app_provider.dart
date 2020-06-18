@@ -26,6 +26,17 @@ class AppProvider with ChangeNotifier {
   AppsFlyerSdkMode appsFlyerSdkMode = AppsFlyerSdkMode.Uninitialized;
   var appsFlyerService = locator<AppsFlyerService>();
 
+  bool _showQuantity = true;
+
+  bool get showQuantity {
+    return _showQuantity;
+  }
+
+  set showQuantity(bool show) {
+    _showQuantity = show;
+    notifyListeners();
+  }
+
   AppProvider() {
     _initAppsFylerSdk().then((_) {
       _getConversionData();

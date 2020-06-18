@@ -5,6 +5,8 @@ import 'package:ezshop/ui/screens/list_detail_screen/widgets/shopping_list_item.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/providers/app_provider.dart';
+
 class ShoppingListDetailView extends StatelessWidget {
   final ShoppingList shoppingList;
   final Mode mode;
@@ -30,10 +32,12 @@ class ShoppingListDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showQuantity = Provider.of<AppProvider>(context).showQuantity;
+
     return ListView.builder(
       itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
         value: filteredList[i],
-        child: ShoppingListItem(shoppingList, i),
+        child: ShoppingListItem(shoppingList, i, showQuantity),
       ),
       itemCount: filteredList.length,
     );

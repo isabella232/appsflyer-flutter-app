@@ -1,6 +1,9 @@
 import 'package:ezshop/ui/widgets/main_side_drawer.dart';
 import 'package:ezshop/ui/widgets/padding_content.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../core/providers/app_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   static const routeName = "/settings";
@@ -18,11 +21,19 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
           children: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Text("Show quantity"),
-                Switch(
-                  onChanged: (val) {},
-                  value: true,
+                Consumer<AppProvider>(
+                  builder: (ctx, appProvider, _) {
+                    return Switch(
+                      activeColor: Theme.of(context).primaryColor,
+                      onChanged: (val) {
+                        appProvider.showQuantity = val;
+                      },
+                      value: appProvider.showQuantity,
+                    );
+                  },
                 ),
               ],
             ),
