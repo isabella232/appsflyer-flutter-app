@@ -4,6 +4,7 @@ import 'package:ezshop/ui/screens/list_detail_screen/widgets/bottom_share_list.d
 import 'package:ezshop/ui/screens/list_detail_screen/widgets/shopping_list_detail_view.dart';
 import 'package:ezshop/ui/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 import '../create_list_screen/create_list_screen.dart';
@@ -35,7 +36,8 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
     final listId = ModalRoute.of(context).settings.arguments as String;
 
     return FutureBuilder(
-      future: Provider.of<ShoppingLists>(context).getListById(listId),
+      future: Provider.of<ShoppingLists>(context, listen: false)
+          .getListById(listId),
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return LoadingWidget();
@@ -83,9 +85,37 @@ class _ListDetailScreenState extends State<ListDetailScreen> {
                     visible: !shoppingList.template,
                   ),
                   Expanded(
-                    child: ShoppingListDetailView(
-                      mode: _mode,
-                      shoppingList: shoppingList,
+                    child: Consumer<ShoppingLists>(
+                      builder: (BuildContext ctx, shoppingLists, _) {
+                        return FutureBuilder(
+                          future: shoppingLists.getListById(listId),
+                          builder: (BuildContext ctx, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return ShoppingListDetailView(
+                                mode: _mode,
+                                shoppingList: shoppingList,
+                              );
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              //return loader
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  SpinKitDoubleBounce(
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  SizedBox(
+                                    height: 12,
+                                  ),
+                                  Text("Loading..."),
+                                ],
+                              );
+                            }
+                            return Center();
+                          },
+                        );
+                      },
                     ),
                   ),
                 ],

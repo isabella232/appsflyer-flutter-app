@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../constants.dart';
-import '../../widgets/main_side_drawer.dart';
+import '../../widgets/main_side_drawer/main_side_drawer.dart';
 
 class AboutScreen extends StatelessWidget {
   static final String routeName = '/about';

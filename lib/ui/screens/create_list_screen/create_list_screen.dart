@@ -142,7 +142,7 @@ class _CreateListScreenState extends State<CreateListScreen> {
               context: context,
               builder: (ctx) => AlertDialog(
                 title: Text("Are you sure you want to exit?"),
-                content: Text("All of the data will be dicarded"),
+                content: Text("All of the data will be discarded"),
                 actions: <Widget>[
                   FlatButton(
                     child: Text("Yes"),

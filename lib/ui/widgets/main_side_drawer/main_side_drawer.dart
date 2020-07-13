@@ -1,11 +1,13 @@
+import 'package:ezshop/ui/widgets/main_side_drawer/widgets/avatar.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:ezshop/core/providers/app_provider.dart';
 import 'package:ezshop/core/providers/auth/auth.dart';
 import 'package:ezshop/ui/screens/about_screen/about_screen.dart';
 import 'package:ezshop/ui/screens/landing_screen/landing_screen.dart';
 import 'package:ezshop/ui/screens/list_overview_screen/lists_overview_screen.dart';
 import 'package:ezshop/ui/screens/settings_screen/settings_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
 
 const DRAWER_HEIGHT = 240.0;
 
@@ -26,36 +28,10 @@ class MainSideDrawer extends StatelessWidget {
                     Image.asset(
                       'assets/images/supermarket-background.jpg',
                       fit: BoxFit.cover,
+                      color: Colors.black.withOpacity(0.7),
+                      colorBlendMode: BlendMode.dstIn,
                     ),
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          CircleAvatar(
-                            child: Icon(
-                              Icons.perm_identity,
-                              size: 72,
-                            ),
-                            radius: 44,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
-                            ),
-                            child: Text(
-                              auth.getUser() != null
-                                  ? auth.getUser().email
-                                  : "",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    Avatar(),
                   ],
                 );
               },

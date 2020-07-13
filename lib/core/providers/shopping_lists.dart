@@ -289,4 +289,8 @@ class ShoppingLists with ChangeNotifier {
     }
     await updateList(myList, listId);
   }
+
+  void notify() {
+    notifyListeners();
+  }
 }

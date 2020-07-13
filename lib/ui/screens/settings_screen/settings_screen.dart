@@ -1,4 +1,4 @@
-import 'package:ezshop/ui/widgets/main_side_drawer.dart';
+import 'package:ezshop/ui/widgets/main_side_drawer/main_side_drawer.dart';
 import 'package:ezshop/ui/widgets/padding_content.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

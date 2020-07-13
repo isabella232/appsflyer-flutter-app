@@ -1,6 +1,8 @@
 import 'package:ezshop/core/models/shopping_list.dart';
 import 'package:ezshop/core/providers/shopping_item.dart';
 import 'package:ezshop/core/providers/shopping_lists.dart';
+import 'package:ezshop/ui/widgets/main_side_drawer/widgets/image_preview_dialog.dart';
+import 'package:ezshop/ui/widgets/pick_image_toolbar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,8 +25,7 @@ class ShoppingListItem extends StatelessWidget {
       onTap: () async {
         opacity = 0.0;
         item.toggleIsChecked();
-        await Provider.of<ShoppingLists>(context)
-            .updateList(shoppingList, shoppingList.id);
+        writeToDb(context);
       },
       child: Column(
         children: <Widget>[
@@ -37,6 +38,53 @@ class ShoppingListItem extends StatelessWidget {
                   : Theme.of(context).primaryColor.withOpacity(0.1),
               child: Row(
                 children: <Widget>[
+                  item.imgUrl != null
+                      ? GestureDetector(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(item.imgUrl),
+                                    fit: BoxFit.cover),
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext ctx) {
+                                return ImagePreviewDialog(
+                                  url: item.imgUrl,
+                                  canEdit: true,
+                                  item: item,
+                                  listId: shoppingList.id,
+                                );
+                              },
+                            );
+                          },
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  addItemImage(context, item);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Icon(Icons.add_a_photo),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                   Visibility(
                     child: Checkbox(
                       onChanged: (val) async {
@@ -76,5 +124,24 @@ class ShoppingListItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void addItemImage(BuildContext ctx, ShoppingItem item) {
+    showModalBottomSheet(
+      context: ctx,
+      builder: (ctx) {
+        return PickImageToolbar(
+          item: item,
+          listId: shoppingList.id,
+        );
+      },
+    ).then((val) async {
+      writeToDb(ctx);
+    });
+  }
+
+  Future<void> writeToDb(BuildContext ctx) async {
+    await Provider.of<ShoppingLists>(ctx)
+        .updateList(shoppingList, shoppingList.id);
   }
 }

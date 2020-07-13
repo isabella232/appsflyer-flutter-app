@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants.dart';
-import '../../widgets/main_side_drawer.dart';
+import '../../widgets/main_side_drawer/main_side_drawer.dart';
 import 'widgets/shopping_list_view_wrapper.dart';
 import '../create_list_screen/create_list_screen.dart';
 import 'widgets/search_list_form.dart';

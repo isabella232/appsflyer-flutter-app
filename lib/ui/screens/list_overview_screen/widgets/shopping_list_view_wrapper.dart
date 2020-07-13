@@ -135,7 +135,8 @@ class _ShoppingListViewState extends State<ShoppingListView> {
                 : Expanded(
                     child: Center(
                       child: Text(
-                        "There are no template lists yet. Add one by pressing on Create New List",
+                        "There are no template lists yet. \n"
+                        "Add one by pressing on Create New List",
                         textAlign: TextAlign.center,
                       ),
                     ),

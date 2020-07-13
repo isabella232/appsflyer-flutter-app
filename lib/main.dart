@@ -1,3 +1,4 @@
+import 'package:ezshop/core/providers/shopping_item.dart';
 import 'package:ezshop/locator.dart';
 import 'package:ezshop/ui/screens/about_screen/about_screen.dart';
 import 'package:ezshop/ui/screens/landing_screen/landing_screen.dart';

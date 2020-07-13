@@ -14,6 +14,6 @@ Configure new iOS and Android app in the Firebase console, following the steps t
 
 ## Future Milestones
 - Add the option to share the list through 3rd party apps like whatsapp, facebook messenger
-- Options to add images to the items in the list
+- Options to add images to the items in the list - Done (v1.0.1)
 
 Feel free to add your thoughts and suggestions to mobilesdk-team@appsflyer.com

@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:ezshop/constants.dart';
+import 'package:ezshop/core/services/api.dart';
 import 'package:ezshop/core/services/appsflyer.dart';
 import 'package:ezshop/locator.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:global_configuration/global_configuration.dart';
@@ -25,6 +29,7 @@ class AppProvider with ChangeNotifier {
   AppMode appMode;
   AppsFlyerSdkMode appsFlyerSdkMode = AppsFlyerSdkMode.Uninitialized;
   var appsFlyerService = locator<AppsFlyerService>();
+  final Api _dataStoreApi = Api.dataStore();
 
   bool _showQuantity = true;
 
@@ -55,6 +60,20 @@ class AppProvider with ChangeNotifier {
     return Constants.HAS_FIREBASE;
   }
 
+  StorageUploadTask uploadImage(String fileName, File file) {
+    StorageUploadTask uploadTask = _dataStoreApi.startUpload(fileName, file);
+    return uploadTask;
+  }
+
+  void notifyUser() {
+    notifyListeners();
+  }
+
+  Future<String> getProfilePic(String userId) async {
+    String fileName = '$userId/profile.png';
+    return await _dataStoreApi.getFile(fileName);
+  }
+
   Future _initAppsFylerSdk() async {
     await GlobalConfiguration().loadFromAsset('app_settings');
     AppsFlyerOptions options = AppsFlyerOptions(
@@ -83,5 +102,10 @@ class AppProvider with ChangeNotifier {
       //handle on app open attribution here
       print(data);
     });
+  }
+
+  Future<String> getFileUrl(String fileName) async {
+    print(fileName);
+    return await _dataStoreApi.getFile(fileName);
   }
 }

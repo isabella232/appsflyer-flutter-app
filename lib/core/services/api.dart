@@ -1,12 +1,33 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Api {
   final Firestore _db = Firestore.instance;
-  final String path;
+  final FirebaseStorage _storage =
+      FirebaseStorage(storageBucket: 'gs://ezshop-dcad9.appspot.com/');
+  String path;
   CollectionReference ref;
+
+  Api.dataStore();
 
   Api(this.path) {
     ref = _db.collection(path);
+  }
+
+  StorageUploadTask startUpload(String filename, File file) {
+    String filepath = 'images/$filename.png';
+    return _storage.ref().child(filepath).putFile(file);
+  }
+
+  Future<dynamic> getFile(String filename) async {
+    String filepath = 'images/$filename';
+    var res =
+        await _storage.ref().child(filepath).getDownloadURL().catchError((err) {
+      return null;
+    });
+    return res;
   }
 
   Future<QuerySnapshot> getDataCollection(List<String> docIds) {
